@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm Hóa học</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .question-section {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+        .option-button {
+            background-color: #e2e8f0;
+            color: #475569;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid transparent;
+            width: 100%;
+        }
+        .option-button:hover:not(.selected):not(.correct):not(.incorrect) {
+            background-color: #cbd5e1;
+        }
+        .option-button.selected {
+            border-color: #3b82f6;
+            background-color: #bfdbfe;
+            color: #1e40af;
+        }
+        .option-button.correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+        .option-button.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .nav-button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border: none;
+        }
+        .nav-button:hover {
+            background-color: #2563eb;
+        }
+        .nav-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .feedback-message {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .feedback-message.correct-feedback {
+            color: #10b981;
+        }
+        .feedback-message.incorrect-feedback {
+            color: #ef4444;
+        }
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #475569;
+            text-align: center;
+            font-style: italic;
+        }
+        .result-section {
+            text-align: center;
+            width: 100%;
+        }
+        .result-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 20px;
+        }
+        .score-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1d4ed8;
+            margin-bottom: 20px;
+        }
+        .restart-button {
+            background-color: #10b981;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border: none;
+        }
+        .restart-button:hover {
+            background-color: #059669;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3b82f6;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <div id="quizContent">
+            <!-- Question and options will be loaded here by JavaScript -->
+        </div>
+        <div id="resultSection" class="result-section hidden">
+            <p class="result-text">Bài kiểm tra hoàn thành!</p>
+            <p id="finalScore" class="score-text"></p>
+            <button id="restartButton" class="restart-button">Làm lại</button>
+        </div>
+    </div>
+
+    <script>
+        // Dữ liệu câu hỏi và đáp án
+        const questions = [
+            {
+                question: "Hiện tượng xảy ra khi đốt Iron trong bình khí clo là:",
+                options: [
+                    "Khói màu trắng sinh ra.",
+                    "Xuất hiện những tia sáng chói.",
+                    "Tạo chất bột trắng bám xung quanh thành bình.",
+                    "Có khói màu nâu đỏ tạo thành."
+                ],
+                answer: "Có khói màu nâu đỏ tạo thành.",
+                explanation: "Khi đốt sắt trong khí clo, phản ứng tạo ra FeCl3 (sắt(III) clorua) có màu nâu đỏ."
+            },
+            {
+                question: "Copper kim loại có thể phản ứng được với:",
+                options: [
+                    "Dung dịch HCl",
+                    "Dung dịch H2SO4 loãng",
+                    "H2SO4 đặc, nóng",
+                    "Dung dịch NaOH"
+                ],
+                answer: "H2SO4 đặc, nóng",
+                explanation: "Đồng (Cu) là kim loại đứng sau Hydro trong dãy hoạt động hóa học nên không phản ứng với HCl và H2SO4 loãng. Đồng cũng không phản ứng với dung dịch NaOH. Tuy nhiên, Cu có thể phản ứng với H2SO4 đặc, nóng để tạo ra CuSO4, SO2 và H2O."
+            },
+            {
+                question: "Dung dịch FeCl2 có lẫn tạp chất là CuCl2 có thể dùng kim loại nào sau đây để làm sạch dung dịch FeCl2 trên:",
+                options: [
+                    "Zn",
+                    "Fe",
+                    "Mg",
+                    "Ag"
+                ],
+                answer: "Fe",
+                explanation: "Để làm sạch dung dịch FeCl2 có lẫn CuCl2, ta dùng Fe. Fe sẽ phản ứng với CuCl2 tạo ra FeCl2 và Cu, sau đó lọc bỏ Cu. Các kim loại khác như Zn, Mg sẽ phản ứng với cả FeCl2, còn Ag thì không phản ứng."
+            },
+            {
+                question: "Các nhóm kim loại nào sau đây phản ứng với HCl sinh ra khí H2:",
+                options: [
+                    "Fe, Cu, K, Ag, Al, Ba",
+                    "Cu, Fe, Zn, Al, Mg, K",
+                    "Mg, K, Fe, Al, Na",
+                    "Zn, Cu, K, Mg, Ag, Al, Ba"
+                ],
+                answer: "Mg, K, Fe, Al, Na",
+                explanation: "Các kim loại phản ứng với HCl sinh ra khí H2 là các kim loại đứng trước Hydro trong dãy hoạt động hóa học. Trong các lựa chọn, Mg, K, Fe, Al, Na đều đứng trước Hydro."
+            },
+            {
+                question: "1 mol Aluminiumc (nhiệt độ, áp suất trong phòng thí nghiệm), khối lượng riêng 2,7 g/ cm3, có thể tích tương ứng là:",
+                options: [
+                    "10 cm3",
+                    "11 cm3",
+                    "12cm3",
+                    "13cm3"
+                ],
+                answer: "10 cm3",
+                explanation: "Khối lượng mol của Al là 27 g/mol. Với khối lượng riêng 2,7 g/cm3, thể tích của 1 mol Al là V = m/D = 27 g / 2,7 g/cm3 = 10 cm3."
+            },
+            {
+                question: "Hãy cho biết cặp hóa chất nào dưới đây có thể tác dụng được với nhau: 1. Zn và dung dịch CuSO4 2. Cu và dung dịch AgNO3 3. Zn và dung dịch MgCl2 4. Al và dung dịch MgCl2 5. Fe và H2SO4 (đ,n) 6. Hg và dung dịch AgNO3",
+                options: [
+                    "1, 2, 5, 6",
+                    "1, 3, 4, 5",
+                    "2, 3, 4, 6",
+                    "1, 2, 3, 4"
+                ],
+                answer: "1, 2, 5, 6",
+                explanation: "1. Zn mạnh hơn Cu nên phản ứng: Zn + CuSO4 -> ZnSO4 + Cu. 2. Cu mạnh hơn Ag nên phản ứng: Cu + 2AgNO3 -> Cu(NO3)2 + 2Ag. 3. Zn yếu hơn Mg nên không phản ứng với MgCl2. 4. Al yếu hơn Mg nên không phản ứng với MgCl2. 5. Fe phản ứng với H2SO4 đặc, nóng. 6. Hg yếu hơn Ag nên không phản ứng với AgNO3 (lưu ý: Hg không phản ứng với AgNO3 theo nguyên tắc kim loại mạnh đẩy kim loại yếu hơn ra khỏi muối, nhưng trong một số trường hợp đặc biệt và điều kiện cụ thể Hg có thể phản ứng với AgNO3 tạo ra Hg2(NO3)2 và Ag. Tuy nhiên, theo quy tắc thông thường của dãy hoạt động hóa học, Cu mạnh hơn Ag, Fe mạnh hơn H, Zn mạnh hơn Cu, nên 1, 2, 5 là chắc chắn. Câu 6: Hg + AgNO3 -> HgNO3 + Ag (phản ứng này xảy ra). Do đó, 1, 2, 5, 6 là các cặp có thể tác dụng."
+            },
+            {
+                question: "Trong các kim loại sau kim loại nào dùng để làm sạch dung dịch ZnSO4 có lẫn tạp chất là CuSO4 ?",
+                options: [
+                    "Fe",
+                    "Zn",
+                    "Cu",
+                    "Mg"
+                ],
+                answer: "Zn",
+                explanation: "Để làm sạch dung dịch ZnSO4 có lẫn CuSO4, ta dùng kim loại Zn. Zn sẽ đẩy Cu ra khỏi muối CuSO4 mà không làm thay đổi dung dịch ZnSO4 ban đầu. (Zn + CuSO4 -> ZnSO4 + Cu). Các kim loại khác như Fe và Mg sẽ phản ứng với cả ZnSO4."
+            },
+            {
+                question: "Nung 6,4g Cu ngoài không khí thu được 6,4g CuO. Hiệu suất phản ứng là:",
+                options: [
+                    "100%",
+                    "80%",
+                    "70%",
+                    "60%"
+                ],
+                answer: "80%",
+                explanation: "Phản ứng: 2Cu + O2 -> 2CuO. Khối lượng mol của Cu là 64 g/mol, CuO là 80 g/mol. Từ 6,4g Cu (0,1 mol Cu) theo lý thuyết sẽ tạo ra 0,1 mol CuO, tức là 0,1 * 80 = 8g CuO. Hiệu suất phản ứng = (khối lượng CuO thực tế thu được / khối lượng CuO lý thuyết) * 100% = (6,4g / 8g) * 100% = 80%."
+            },
+            {
+                question: "Để làm sạch dung dịch Copper niTrảt có lẫn tạp chất Silver niTrảt người ta dùng kim loại:",
+                options: [
+                    "Mg",
+                    "Cu",
+                    "Fe",
+                    "Au"
+                ],
+                answer: "Cu",
+                explanation: "Để làm sạch dung dịch Cu(NO3)2 có lẫn AgNO3, ta dùng kim loại Cu. Cu sẽ phản ứng với AgNO3 tạo ra Cu(NO3)2 và Ag, sau đó lọc bỏ Ag. (Cu + 2AgNO3 -> Cu(NO3)2 + 2Ag). Các kim loại khác như Mg và Fe sẽ phản ứng với cả Cu(NO3)2."
+            },
+            {
+                question: "Lấy một ít bột Fe cho vào dung dịch HCl vừa đủ rồi nhỏ từ từ dung dịch NaOH đến dư vào dung dịch. Hiện tượng xảy ra là:",
+                options: [
+                    "Có khí bay ra và dung dịch có màu xanh lam.",
+                    "Không thấy hiện tượng gì.",
+                    "Ban đầu có khí thoát ra và dd có kết tủa trắng xanh rồi chuyển dần thành màu nâu đỏ.",
+                    "Có khí thoát ra và tạo kết tủa màu xanh đến khi kết thúc."
+                ],
+                answer: "Ban đầu có khí thoát ra và dd có kết tủa trắng xanh rồi chuyển dần thành màu nâu đỏ.",
+                explanation: "1. Fe + 2HCl -> FeCl2 + H2 (khí bay ra). 2. FeCl2 + 2NaOH -> Fe(OH)2 (kết tủa trắng xanh) + 2NaCl. 3. 4Fe(OH)2 + O2 + 2H2O -> 4Fe(OH)3 (kết tủa nâu đỏ). Fe(OH)2 dễ bị oxi hóa trong không khí tạo thành Fe(OH)3 có màu nâu đỏ."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null); // To store user's selected answer for each question
+
+        const quizContent = document.getElementById('quizContent');
+        const resultSection = document.getElementById('resultSection');
+        const finalScore = document.getElementById('finalScore');
+        const restartButton = document.getElementById('restartButton');
+        const progressBar = document.getElementById('progressBar');
+
+        // Hàm hiển thị câu hỏi
+        function displayQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const q = questions[currentQuestionIndex];
+                quizContent.innerHTML = `
+                    <div class="question-section">
+                        <p class="question-text">Câu ${currentQuestionIndex + 1}: ${q.question}</p>
+                        <div class="options-container" id="optionsContainer">
+                            ${q.options.map((option, index) => `
+                                <button class="option-button" data-index="${index}">${String.fromCharCode(65 + index)}. ${option}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="feedback-message" id="feedbackMessage"></div>
+                    <div class="explanation-text" id="explanationText"></div>
+                    <div class="navigation-buttons">
+                        <button id="prevButton" class="nav-button" ${currentQuestionIndex === 0 ? 'disabled' : ''}>Câu trước</button>
+                        <button id="nextButton" class="nav-button">Kiểm tra & Câu tiếp theo</button>
+                    </div>
+                `;
+
+                const optionsContainer = document.getElementById('optionsContainer');
+                optionsContainer.addEventListener('click', selectOption);
+
+                const prevButton = document.getElementById('prevButton');
+                prevButton.addEventListener('click', showPreviousQuestion);
+
+                const nextButton = document.getElementById('nextButton');
+                nextButton.addEventListener('click', checkAnswerAndNext);
+
+                // Highlight previously selected answer if any
+                if (userAnswers[currentQuestionIndex] !== null) {
+                    const selectedOptionButton = optionsContainer.querySelector(`[data-index="${userAnswers[currentQuestionIndex]}"]`);
+                    if (selectedOptionButton) {
+                        selectedOptionButton.classList.add('selected');
+                    }
+                }
+                updateProgressBar();
+            } else {
+                showResults();
+            }
+        }
+
+        // Hàm chọn đáp án
+        function selectOption(event) {
+            const target = event.target;
+            if (target.classList.contains('option-button')) {
+                // Remove 'selected' class from all options
+                document.querySelectorAll('.option-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                    btn.classList.remove('correct');
+                    btn.classList.remove('incorrect');
+                });
+                // Add 'selected' class to the clicked option
+                target.classList.add('selected');
+                userAnswers[currentQuestionIndex] = parseInt(target.dataset.index);
+                document.getElementById('feedbackMessage').textContent = ''; // Clear feedback
+                document.getElementById('explanationText').textContent = ''; // Clear explanation
+            }
+        }
+
+        // Hàm kiểm tra đáp án và chuyển câu hỏi
+        function checkAnswerAndNext() {
+            const selectedOptionIndex = userAnswers[currentQuestionIndex];
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const explanationText = document.getElementById('explanationText');
+            const optionsButtons = document.querySelectorAll('.option-button');
+            const nextButton = document.getElementById('nextButton');
+
+            // Disable buttons after checking
+            optionsButtons.forEach(btn => btn.disabled = true);
+            nextButton.disabled = true;
+
+            if (selectedOptionIndex !== null) {
+                const selectedAnswer = questions[currentQuestionIndex].options[selectedOptionIndex];
+                const correctAnswer = questions[currentQuestionIndex].answer;
+                const explanation = questions[currentQuestionIndex].explanation;
+
+                optionsButtons.forEach((btn, index) => {
+                    if (questions[currentQuestionIndex].options[index] === correctAnswer) {
+                        btn.classList.add('correct');
+                    }
+                    if (index === selectedOptionIndex && selectedAnswer !== correctAnswer) {
+                        btn.classList.add('incorrect');
+                    }
+                });
+
+                if (selectedAnswer === correctAnswer) {
+                    score++;
+                    feedbackMessage.textContent = 'Chính xác!';
+                    feedbackMessage.className = 'feedback-message correct-feedback';
+                    explanationText.textContent = ''; // No explanation needed for correct answer
+                } else {
+                    feedbackMessage.textContent = 'Sai rồi. Đáp án đúng là: ' + correctAnswer;
+                    feedbackMessage.className = 'feedback-message incorrect-feedback';
+                    explanationText.textContent = 'Giải thích: ' + explanation;
+                }
+
+                // Allow user to proceed after seeing feedback
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                    // Re-enable buttons for the new question
+                    optionsButtons.forEach(btn => btn.disabled = false);
+                    nextButton.disabled = false;
+                }, 2500); // Wait 2.5 seconds before moving to the next question to allow reading explanation
+            } else {
+                feedbackMessage.textContent = 'Vui lòng chọn một đáp án.';
+                feedbackMessage.className = 'feedback-message incorrect-feedback';
+                explanationText.textContent = '';
+                // Re-enable buttons if no option was selected
+                optionsButtons.forEach(btn => btn.disabled = false);
+                nextButton.disabled = false;
+            }
+        }
+
+        // Hàm hiển thị câu hỏi trước đó
+        function showPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        // Hàm hiển thị kết quả cuối cùng
+        function showResults() {
+            quizContent.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            finalScore.textContent = `Bạn đã trả lời đúng ${score} trên ${questions.length} câu.`;
+            updateProgressBar();
+        }
+
+        // Hàm cập nhật thanh tiến độ
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Hàm khởi động lại bài kiểm tra
+        restartButton.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers.fill(null);
+            resultSection.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            displayQuestion();
+        });
+
+        // Khởi tạo bài kiểm tra khi tải trang
+        document.addEventListener('DOMContentLoaded', displayQuestion);
+    </script>
+</body>
+</html>
