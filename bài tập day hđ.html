@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài tập trắc nghiệm Hóa học</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            box-sizing: border-box;
+            margin-top: 50px;
+        }
+        .question-card {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .options-container label {
+            display: block;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+        }
+        .options-container label:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .options-container input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            accent-color: #4f46e5; /* Tailwind indigo-600 */
+        }
+        .options-container label.correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-color: #34d399; /* Tailwind green-400 */
+            color: #065f46; /* Tailwind green-900 */
+        }
+        .options-container label.incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-color: #ef4444; /* Tailwind red-500 */
+            color: #991b1b; /* Tailwind red-900 */
+        }
+        .feedback-message {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .feedback-message.correct {
+            background-color: #ecfdf5; /* Tailwind green-50 */
+            color: #047857; /* Tailwind green-700 */
+            border: 1px solid #a7f3d0; /* Tailwind green-200 */
+        }
+        .feedback-message.incorrect {
+            background-color: #fef2f2; /* Tailwind red-50 */
+            color: #b91c1c; /* Tailwind red-700 */
+            border: 1px solid #fecaca; /* Tailwind red-200 */
+        }
+        .submit-button {
+            background-color: #4f46e5; /* Tailwind indigo-600 */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+        .submit-button:hover {
+            background-color: #4338ca; /* Tailwind indigo-700 */
+            transform: translateY(-1px);
+        }
+        .submit-button:active {
+            transform: translateY(0);
+        }
+        .submit-button:disabled {
+            background-color: #9ca3af; /* Tailwind gray-400 */
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .navigation-buttons button {
+            background-color: #6b7280; /* Tailwind gray-500 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .navigation-buttons button:hover {
+            background-color: #4b5563; /* Tailwind gray-600 */
+        }
+        .navigation-buttons button:disabled {
+            background-color: #d1d5db; /* Tailwind gray-300 */
+            cursor: not-allowed;
+        }
+        .results-container {
+            text-align: center;
+            padding: 30px;
+            background-color: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        .results-container h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .results-container p {
+            font-size: 1.5rem;
+            color: #4b5563;
+            margin-bottom: 25px;
+        }
+        .restart-button {
+            background-color: #10b981; /* Tailwind emerald-500 */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .restart-button:hover {
+            background-color: #059669; /* Tailwind emerald-600 */
+            transform: translateY(-1px);
+        }
+        .restart-button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Bài tập Trắc nghiệm Hóa học</h1>
+        <div id="quiz-content">
+            <!-- Questions will be loaded here by JavaScript -->
+        </div>
+        <div id="results-content" class="results-container hidden">
+            <h2>Kết quả bài làm</h2>
+            <p>Bạn đã trả lời đúng <span id="score-display" class="font-bold text-indigo-600">0</span>/<span id="total-questions"></span> câu.</p>
+            <button id="restart-btn" class="restart-button">Làm lại bài</button>
+        </div>
+        <div class="navigation-buttons">
+            <button id="prev-btn" disabled>Câu trước</button>
+            <button id="next-btn">Câu tiếp theo</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Trong các kim loại sau, kim loại nào hoạt động hóa học mạnh nhất ?",
+                options: ["Cu", "Al", "Zn", "Fe"],
+                correctAnswer: "Al",
+                feedback: {
+                    correct: "Chính xác! Nhôm (Al) là kim loại hoạt động hóa học mạnh hơn Cu, Zn, Fe.",
+                    incorrect: "Chưa chính xác. Hãy nhớ lại dãy hoạt động hóa học của kim loại. Al hoạt động mạnh hơn Cu, Zn, Fe."
+                }
+            },
+            {
+                question: "Trong các kim loại sau, kim loại nào hoạt động hóa học yếu nhất ?",
+                options: ["Cu", "Al", "Zn", "Fe"],
+                correctAnswer: "Cu",
+                feedback: {
+                    correct: "Đúng rồi! Đồng (Cu) là kim loại hoạt động hóa học yếu nhất trong số các lựa chọn này.",
+                    incorrect: "Sai rồi. Đồng (Cu) là kim loại hoạt động hóa học yếu nhất trong nhóm này. Hãy ôn lại kiến thức về dãy hoạt động hóa học."
+                }
+            },
+            {
+                question: "Cho dãy các kim loại : K, Mg, Cu, Al số kim loại trong dãy phản ứng được với dung dịch HCl",
+                options: ["2", "4", "3", "1"],
+                correctAnswer: "3", // K, Mg, Al
+                feedback: {
+                    correct: "Rất tốt! Có 3 kim loại là K, Mg, Al phản ứng được với HCl. Cu không phản ứng vì đứng sau H trong dãy hoạt động hóa học.",
+                    incorrect: "Hãy xem xét kỹ dãy hoạt động hóa học. Các kim loại đứng trước H trong dãy hoạt động hóa học sẽ phản ứng với dung dịch HCl. K, Mg, Al phản ứng, còn Cu thì không."
+                }
+            },
+            {
+                question: "Các nhóm kim loại nào sau đây phản ứng với HCl sinh ra khí H2:",
+                options: ["Fe, Cu, K, Ag, Al, Ba.", "Cu, Fe, Zn, Al, Mg, K.", "Mg, K, Fe, Al, Na.", "Zn, Cu, K, Mg, Ag, Al, Ba."],
+                correctAnswer: "Mg, K, Fe, Al, Na.",
+                feedback: {
+                    correct: "Hoàn toàn chính xác! Các kim loại như Mg, K, Fe, Al, Na đều đứng trước H trong dãy hoạt động hóa học nên phản ứng với HCl sinh ra H2.",
+                    incorrect: "Chưa đúng. Để phản ứng với HCl sinh ra H2, kim loại phải đứng trước H trong dãy hoạt động hóa học. Hãy kiểm tra lại các lựa chọn."
+                }
+            },
+            {
+                question: "Nhóm kim loại nào tác dụng với nước ở nhiệt độ thường",
+                options: ["Cu, Ca, K", "Zn, Na, Cu", "Ca, Mg, Zn", "K, Na, Ca"],
+                correctAnswer: "K, Na, Ca",
+                feedback: {
+                    correct: "Chính xác! K, Na, Ca là các kim loại kiềm và kiềm thổ mạnh, có khả năng tác dụng với nước ở nhiệt độ thường.",
+                    incorrect: "Sai rồi. Các kim loại kiềm và một số kim loại kiềm thổ mạnh như K, Na, Ca mới có thể tác dụng với nước ở nhiệt độ thường."
+                }
+            },
+            {
+                question: "Dãy các kim loại sau đây sắp xếp theo chiều hoạt động kim loại tăng dần là:",
+                options: ["Fe, Cu, K, Mg, Al, Ba.", "Cu, Fe, Zn, Al, Mg, K.", "Mg, K, Fe, Cu, Na.", "Zn, Cu, K, Mg."],
+                correctAnswer: "Cu, Fe, Zn, Al, Mg, K.",
+                feedback: {
+                    correct: "Rất tốt! Dãy hoạt động kim loại tăng dần là Cu < Fe < Zn < Al < Mg < K.",
+                    incorrect: "Chưa đúng. Hãy nhớ lại dãy hoạt động hóa học của kim loại để sắp xếp theo chiều tăng dần."
+                }
+            },
+            {
+                question: "Dãy các kim loại sau đây sắp xếp theo chiều hoạt động kim loại giảm dần là:",
+                options: ["Fe, Cu, K, Mg.", "K, Mg, Fe, Cu.", "Cu, Fe, K, Mg.", "K, Fe, Mg, Cu."],
+                correctAnswer: "K, Mg, Fe, Cu.",
+                feedback: {
+                    correct: "Chính xác! Dãy hoạt động kim loại giảm dần là K > Mg > Fe > Cu.",
+                    incorrect: "Sai rồi. Hãy sắp xếp các kim loại theo chiều hoạt động hóa học giảm dần. Kim loại mạnh nhất đứng đầu."
+                }
+            },
+            {
+                question: "Kim loại nào sau đây hoạt động mạnh hơn kim loại Zn?",
+                options: ["Ag.", "Na.", "Cu.", "Au."],
+                correctAnswer: "Na.",
+                feedback: {
+                    correct: "Tuyệt vời! Natri (Na) là kim loại hoạt động mạnh hơn Kẽm (Zn).",
+                    incorrect: "Chưa đúng. Trong các lựa chọn, Natri (Na) là kim loại hoạt động mạnh hơn Kẽm (Zn). Hãy xem lại dãy hoạt động hóa học."
+                }
+            },
+            {
+                question: "Cặp chất không xảy ra phản ứng là :",
+                options: ["Ag + Cu(NO3)2", "Cu + AgNO3", "Zn + Fe(NO3)2", "Fe + Cu(NO3)2"],
+                correctAnswer: "Ag + Cu(NO3)2",
+                feedback: {
+                    correct: "Chính xác! Bạc (Ag) yếu hơn Đồng (Cu) nên không thể đẩy Đồng ra khỏi muối. Do đó, Ag + Cu(NO3)2 không xảy ra phản ứng.",
+                    incorrect: "Chưa chính xác. Phản ứng thế kim loại chỉ xảy ra khi kim loại đứng trước đẩy kim loại đứng sau ra khỏi muối của nó. Ag yếu hơn Cu nên Ag không phản ứng với Cu(NO3)2."
+                }
+            },
+            {
+                question: "Cặp chất nào sau đây xảy ra phản ứng ?",
+                options: ["Cu + ZnCl2", "Zn + CuCl2", "Ca + ZnCl2", "Zn + ZnCl2"],
+                correctAnswer: "Zn + CuCl2",
+                feedback: {
+                    correct: "Đúng rồi! Kẽm (Zn) mạnh hơn Đồng (Cu) nên Zn có thể đẩy Cu ra khỏi muối của nó: Zn + CuCl2 → ZnCl2 + Cu.",
+                    incorrect: "Sai rồi. Hãy nhớ quy tắc kim loại mạnh đẩy kim loại yếu ra khỏi muối. Zn mạnh hơn Cu, nên Zn sẽ phản ứng với CuCl2."
+                }
+            },
+            {
+                question: "Cho kim loại Na vào dung dịch CuSO4 có hiện tượng gì xảy ra ?",
+                options: ["Xuất hiện chất rắn màu đỏ, có khí thoát ra.", "Có khí thoát ra đồng thời xuất hiện kết tủa màu xanh.", "Có khí thoát ra đồng thời xuất hiện kết tủa màu đỏ.", "Xuất hiện kết tủa màu xanh."],
+                correctAnswer: "Có khí thoát ra đồng thời xuất hiện kết tủa màu xanh.",
+                feedback: {
+                    correct: "Chính xác! Na phản ứng với nước trong dung dịch tạo NaOH và H2. NaOH sau đó phản ứng với CuSO4 tạo Cu(OH)2 kết tủa màu xanh. Hiện tượng là có khí thoát ra và xuất hiện kết tủa màu xanh.",
+                    incorrect: "Chưa đúng. Na là kim loại kiềm, nó sẽ phản ứng với nước trước khi phản ứng với muối. Phản ứng của Na với nước tạo ra NaOH và khí H2. Sau đó NaOH phản ứng với CuSO4 tạo kết tủa Cu(OH)2 màu xanh."
+                }
+            },
+            {
+                question: "Trong các cặp chất sau đây, cặp chất nào xảy ra phản ứng ?",
+                options: ["Cu + ZnSO4.", "Ag + HCl.", "Ag + CuSO4.", "Zn + Pb(NO3)2."],
+                correctAnswer: "Zn + Pb(NO3)2.",
+                feedback: {
+                    correct: "Rất tốt! Kẽm (Zn) mạnh hơn Chì (Pb) nên Zn có thể đẩy Pb ra khỏi muối của nó: Zn + Pb(NO3)2 → Zn(NO3)2 + Pb.",
+                    incorrect: "Sai rồi. Hãy nhớ lại dãy hoạt động hóa học. Kim loại mạnh hơn sẽ đẩy kim loại yếu hơn ra khỏi dung dịch muối của nó. Zn mạnh hơn Pb."
+                }
+            },
+            {
+                question: "Dãy gồm các kim loại đều phản ứng với nước ở nhiệt độ thường tạo ra dung dịch có môi trường kiềm là?",
+                options: ["Na, Ba, K.", "Be, Na, Ca.", "Na, Fe, K.", "Na, Cr, K."],
+                correctAnswer: "Na, Ba, K.",
+                feedback: {
+                    correct: "Chính xác! Na, Ba, K là các kim loại kiềm và kiềm thổ mạnh, phản ứng với nước ở nhiệt độ thường tạo ra dung dịch bazơ (môi trường kiềm).",
+                    incorrect: "Chưa đúng. Các kim loại kiềm và kiềm thổ mạnh như Na, Ba, K mới có thể phản ứng với nước ở nhiệt độ thường tạo dung dịch kiềm."
+                }
+            },
+            {
+                question: "Cho dãy các kim loại: Fe, Na, K, Ca. Số kim loại trong dãy tác dụng được với nước ở nhiệt độ thường là?",
+                options: ["4.", "1.", "3.", "2."],
+                correctAnswer: "3.", // Na, K, Ca
+                feedback: {
+                    correct: "Rất tốt! Có 3 kim loại là Na, K, Ca tác dụng được với nước ở nhiệt độ thường. Fe thì không.",
+                    incorrect: "Sai rồi. Hãy xác định các kim loại kiềm và kiềm thổ mạnh trong dãy. Na, K, Ca tác dụng được với nước ở nhiệt độ thường."
+                }
+            },
+            {
+                question: "Khi cho thanh kẽm vào dung dịch FeSO4 thì khối lượng dung dịch sau phản ứng so với ban đầu sẽ",
+                options: ["giảm.", "không đổi.", "tăng.", "ban đầu tăng sau đó giảm xuống."],
+                correctAnswer: "tăng.",
+                feedback: {
+                    correct: "Chính xác! Phản ứng là Zn + FeSO4 → ZnSO4 + Fe. Khối lượng thanh Zn giảm (Zn tan vào dd), khối lượng Fe bám vào thanh. Vì M(Zn) > M(Fe) nên khối lượng dung dịch tăng.",
+                    incorrect: "Chưa chính xác. Hãy xem xét sự thay đổi khối lượng của thanh kim loại và dung dịch. Zn (65) thay thế Fe (56). Khối lượng dung dịch sẽ tăng."
+                }
+            },
+            {
+                question: "Khi cho Na vào dung dịch CuSO4 có hiện tượng:",
+                options: ["có khí bay ra và có kết tủa màu xanh", "có kết tủa màu đỏ", "có khí bay ra và có kết tủa màu đỏ", "có khí bay ra."],
+                correctAnswer: "có khí bay ra và có kết tủa màu xanh",
+                feedback: {
+                    correct: "Đúng rồi! Na phản ứng với nước tạo NaOH và H2 (khí bay ra). NaOH phản ứng với CuSO4 tạo Cu(OH)2 (kết tủa màu xanh).",
+                    incorrect: "Chưa đúng. Na phản ứng với nước trước. Sản phẩm của phản ứng đó sẽ tiếp tục phản ứng với CuSO4. Hiện tượng sẽ là có khí và kết tủa màu xanh."
+                }
+            },
+            {
+                question: "Bột Ag có lẫn tạp chất là bột Fe, Cu và bột Pb. Muốn tách Ag ra khỏi hỗn hợp mà không làm thay đổi khối lượng, ta dùng hóa chất nào sau đây ?",
+                options: ["AgNO3", "HCl", "NaOH", "FeCl3"],
+                correctAnswer: "FeCl3",
+                feedback: {
+                    correct: "Tuyệt vời! FeCl3 sẽ hòa tan Fe và Cu (vì Fe, Cu đứng trước Fe3+ trong dãy điện hóa, Fe3+ có tính oxi hóa mạnh hơn Fe2+), và không phản ứng với Ag và Pb. Sau đó, có thể lọc để tách Ag và Pb. Để tách Pb khỏi Ag, có thể dùng dung dịch Pb(NO3)2 sau đó điện phân.",
+                    incorrect: "Chưa chính xác. Cần một hóa chất có thể hòa tan tạp chất (Fe, Cu, Pb) mà không hòa tan Ag. FeCl3 là lựa chọn phù hợp vì Fe và Cu phản ứng với FeCl3, còn Ag thì không. Pb cũng không phản ứng trực tiếp với FeCl3."
+                }
+            },
+            {
+                question: "Chất nào sau đây không phải là oxit bazơ?",
+                options: ["CuO", "SO2", "Fe2O3", "Na2O"],
+                correctAnswer: "SO2",
+                feedback: {
+                    correct: "Chính xác! SO2 là oxit axit, không phải oxit bazơ.",
+                    incorrect: "Chưa chính xác. SO2 là oxit axit (oxit của phi kim), trong khi CuO, Fe2O3, Na2O là oxit bazơ (oxit của kim loại)."
+                }
+            },
+            {
+                question: "Dung dịch nào sau đây làm quỳ tím chuyển màu đỏ?",
+                options: ["NaCl", "NaOH", "H2SO4", "KOH"],
+                correctAnswer: "H2SO4",
+                feedback: {
+                    correct: "Đúng rồi! H2SO4 là axit, làm quỳ tím chuyển màu đỏ. Các chất còn lại là muối trung tính hoặc bazơ.",
+                    incorrect: "Sai rồi. Quỳ tím chuyển đỏ khi gặp môi trường axit. H2SO4 là một axit mạnh."
+                }
+            },
+            {
+                question: "Kim loại nào sau đây tác dụng với dung dịch HCl tạo ra khí H2?",
+                options: ["Cu", "Ag", "Fe", "Au"],
+                correctAnswer: "Fe",
+                feedback: {
+                    correct: "Rất tốt! Sắt (Fe) đứng trước Hydro trong dãy hoạt động hóa học nên phản ứng với HCl tạo H2. Cu, Ag, Au đứng sau Hydro.",
+                    incorrect: "Chưa đúng. Kim loại phải đứng trước Hydro trong dãy hoạt động hóa học mới có thể tác dụng với HCl tạo ra H2. Sắt (Fe) là kim loại đó."
+                }
+            },
+            {
+                question: "Phản ứng nào sau đây là phản ứng thế?",
+                options: ["CaO + H2O → Ca(OH)2", "Fe + CuSO4 → FeSO4 + Cu", "HCl + NaOH → NaCl + H2O", "CO2 + H2O → H2CO3"],
+                correctAnswer: "Fe + CuSO4 → FeSO4 + Cu",
+                feedback: {
+                    correct: "Chính xác! Phản ứng Fe + CuSO4 → FeSO4 + Cu là phản ứng thế, trong đó kim loại Fe đẩy kim loại Cu ra khỏi hợp chất.",
+                    incorrect: "Sai rồi. Phản ứng thế là phản ứng giữa đơn chất và hợp chất, trong đó nguyên tử của đơn chất thay thế một nguyên tử của nguyên tố khác trong hợp chất. Hãy xem xét lại định nghĩa và các ví dụ."
+                }
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        // Mảng để lưu trữ câu trả lời của người dùng và trạng thái đúng/sai
+        // Mỗi phần tử sẽ là { selected: 'đáp án đã chọn', isCorrect: true/false } hoặc null nếu chưa trả lời
+        const userAnswers = Array(questions.length).fill(null);
+
+        const quizContent = document.getElementById('quiz-content');
+        const resultsContent = document.getElementById('results-content');
+        const scoreDisplay = document.getElementById('score-display');
+        const totalQuestionsDisplay = document.getElementById('total-questions');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Hàm hiển thị câu hỏi
+        function displayQuestion() {
+            // Ẩn phần kết quả nếu đang hiển thị
+            resultsContent.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+
+            const q = questions[currentQuestionIndex];
+            let optionsHtml = '';
+            q.options.forEach((option, index) => {
+                const optionId = `q${currentQuestionIndex}-option${index}`;
+                // Kiểm tra nếu câu hỏi đã được trả lời để pre-select và thêm class đúng/sai
+                const isChecked = userAnswers[currentQuestionIndex] && userAnswers[currentQuestionIndex].selected === option;
+                let optionClass = '';
+                let isDisabled = '';
+
+                if (userAnswers[currentQuestionIndex] && userAnswers[currentQuestionIndex].selected !== null) {
+                    isDisabled = 'disabled'; // Vô hiệu hóa nếu đã trả lời
+                    if (option === q.correctAnswer) {
+                        optionClass = 'correct';
+                    } else if (isChecked) {
+                        optionClass = 'incorrect';
+                    }
+                }
+
+                optionsHtml += `
+                    <label for="${optionId}" class="rounded-lg ${optionClass}">
+                        <input type="radio" id="${optionId}" name="question${currentQuestionIndex}" value="${option}" class="mr-3" ${isChecked ? 'checked' : ''} ${isDisabled}>
+                        ${option}
+                    </label>
+                `;
+            });
+
+            quizContent.innerHTML = `
+                <div class="question-card">
+                    <p class="question-text">Câu ${currentQuestionIndex + 1}. ${q.question}</p>
+                    <div class="options-container">
+                        ${optionsHtml}
+                    </div>
+                    <div id="feedback-${currentQuestionIndex}" class="feedback-message ${userAnswers[currentQuestionIndex] ? (userAnswers[currentQuestionIndex].isCorrect ? 'correct' : 'incorrect') : 'hidden'}">
+                        ${userAnswers[currentQuestionIndex] ? (userAnswers[currentQuestionIndex].isCorrect ? q.feedback.correct : q.feedback.incorrect) : ''}
+                    </div>
+                </div>
+            `;
+
+            // Thêm sự kiện lắng nghe cho các radio button nếu chưa trả lời
+            if (!userAnswers[currentQuestionIndex] || userAnswers[currentQuestionIndex].selected === null) {
+                const radioButtons = document.querySelectorAll(`input[name="question${currentQuestionIndex}"]`);
+                radioButtons.forEach(radio => {
+                    radio.addEventListener('change', (event) => checkAnswer(event.target.value));
+                });
+            }
+
+            updateNavigationButtons();
+        }
+
+        // Hàm kiểm tra đáp án
+        function checkAnswer(selectedOption) {
+            const q = questions[currentQuestionIndex];
+            const feedbackDiv = document.getElementById(`feedback-${currentQuestionIndex}`);
+            const optionsLabels = document.querySelectorAll(`.options-container label`);
+
+            const isCorrect = selectedOption === q.correctAnswer;
+            userAnswers[currentQuestionIndex] = {
+                selected: selectedOption,
+                isCorrect: isCorrect
+            };
+
+            // Xóa các lớp correct/incorrect cũ
+            optionsLabels.forEach(label => {
+                label.classList.remove('correct', 'incorrect');
+            });
+
+            // Đánh dấu đáp án đã chọn và hiển thị feedback
+            optionsLabels.forEach(label => {
+                const input = label.querySelector('input');
+                if (input.value === selectedOption) {
+                    if (isCorrect) {
+                        label.classList.add('correct');
+                        feedbackDiv.textContent = q.feedback.correct;
+                        feedbackDiv.classList.remove('incorrect', 'hidden');
+                        feedbackDiv.classList.add('correct');
+                    } else {
+                        label.classList.add('incorrect');
+                        feedbackDiv.textContent = q.feedback.incorrect;
+                        feedbackDiv.classList.remove('correct', 'hidden');
+                        feedbackDiv.classList.add('incorrect');
+                    }
+                } else if (input.value === q.correctAnswer) {
+                    // Nếu người dùng chọn sai, vẫn highlight đáp án đúng
+                    label.classList.add('correct');
+                }
+            });
+
+            // Vô hiệu hóa tất cả các radio button sau khi chọn
+            const radioButtons = document.querySelectorAll(`input[name="question${currentQuestionIndex}"]`);
+            radioButtons.forEach(radio => {
+                radio.disabled = true;
+            });
+        }
+
+        // Cập nhật trạng thái nút điều hướng
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = "Hoàn thành bài";
+            } else {
+                nextBtn.textContent = "Câu tiếp theo";
+            }
+        }
+
+        // Hàm hiển thị kết quả
+        function showResults() {
+            quizContent.classList.add('hidden');
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            resultsContent.classList.remove('hidden');
+
+            let finalScore = 0;
+            userAnswers.forEach(answer => {
+                if (answer && answer.isCorrect) {
+                    finalScore++;
+                }
+            });
+
+            scoreDisplay.textContent = finalScore;
+            totalQuestionsDisplay.textContent = questions.length;
+        }
+
+        // Hàm khởi động lại bài kiểm tra
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers.fill(null); // Đặt lại tất cả câu trả lời
+            displayQuestion();
+        }
+
+        // Xử lý sự kiện nút "Câu trước"
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        });
+
+        // Xử lý sự kiện nút "Câu tiếp theo" hoặc "Hoàn thành bài"
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                // Đã ở câu cuối cùng, chuyển sang hiển thị kết quả
+                showResults();
+            }
+        });
+
+        // Xử lý sự kiện nút "Làm lại bài"
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Hiển thị câu hỏi đầu tiên khi tải trang
+        document.addEventListener('DOMContentLoaded', displayQuestion);
+    </script>
+</body>
+</html>
